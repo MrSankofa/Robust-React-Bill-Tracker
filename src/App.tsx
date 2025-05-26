@@ -17,8 +17,6 @@ function App() {
     // todo: parse out components and separate add bill page from the landing page which will be the dashboard
     // todo: set up redux for bills
 
-
-
     const [editingBillId, setEditingBillingId] = useState<string | null>( null);
 
     const isEditing = editingBillId !== null;
@@ -74,6 +72,10 @@ function App() {
     const startEditing = ( bill: Bill) => {
         setFormData(bill);
         setEditingBillingId(bill.id)
+    }
+
+    const deleteBill = (targetBill: Bill) => {
+        setBills( bills => bills.filter( bill => bill.id !== targetBill.id));
     }
 
 
@@ -186,6 +188,7 @@ function App() {
                               <td> {bill["isPaid"] ? "Yes" : "No"} </td>
                               <td>
                                   <button onClick={ () => { startEditing(bill)}}>Edit</button>
+                                  <button onClick={ () => { deleteBill(bill)}}>Delete</button>
                               </td>
                           </tr>
                       })}

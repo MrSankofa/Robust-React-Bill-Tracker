@@ -96,3 +96,38 @@ test('editing a second bill before submitting the first only updates the last on
     expect(billNames).not.toContain('Bill B');
 
 });
+
+test('deletes the correct bill when deleting', () => {
+    render(<App />);
+
+    // Add two bills
+    addBill({ name: 'Bill One' });
+    addBill({ name: 'Bill Two' });
+
+    const deleteButtons = screen.getAllByRole('button', { name: /Delete/i });
+
+    // Grab all <td> elements that represent bill names (first column)
+    const billNames = screen
+        .getAllByRole('cell')
+        .filter((_, index) => index % 7 === 0) // name is every 7th cell in the table row
+        .map(cell => cell.textContent?.trim());
+
+    expect(billNames).toHaveLength(2);
+
+    // delete first bill
+    fireEvent.click(deleteButtons[0]);
+
+    const updateBillNames = screen
+        .getAllByRole('cell')
+        .filter((_, index) => index % 7 === 0) // name is every 7th cell in the table row
+        .map(cell => cell.textContent?.trim());
+
+    expect(updateBillNames).toHaveLength(1);
+
+    expect(updateBillNames).toContain('Bill Two');
+    expect(updateBillNames).not.toContain('Bill One');
+
+
+
+})
+
