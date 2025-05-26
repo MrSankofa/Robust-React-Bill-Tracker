@@ -189,7 +189,9 @@ function App() {
                               <td> {bill["category"]}</td>
                               <td> {bill["source"]}</td>
                               <td> {bill["isPaid"] ? "Yes" : "No"} </td>
-                              <button onClick={ () => { toggleEdit(bill)}}>Edit</button>
+                              <td>
+                                  <button onClick={ () => { toggleEdit(bill)}}>Edit</button>
+                              </td>
                           </tr>
                       })}
                       </tbody>
