@@ -14,6 +14,33 @@ function App() {
 
 
 
+    const [billName, setBillName] = useState("");
+    const [amount, setAmount] = useState(0);
+    const [dueDate, setDueDate] = useState(0);
+    const [category, setCategory] = useState("");
+    const [source, setSource] = useState("");
+
+
+    const addBill = () => {
+        const bill = {
+            billName,
+            amount,
+            dueDate,
+            category,
+            source
+        };
+
+        setBills( (bills) => [...bills, bill] );
+
+        setBillName(() => "");
+        setAmount(() => 0);
+        setDueDate(() => 0);
+        setCategory(() => "");
+        setSource(() => "");
+    }
+
+
+
   return (
       <>
           <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
@@ -24,17 +51,17 @@ function App() {
 
                   <form className={"w-full"}>
                       <label className={"form"} htmlFor="billName">Bill Name</label>
-                      <input type="text" name={"billName"}/>
-                      <label className={"form"} htmlFor="billAmount">Bill Amount</label>
-                      <input type="text" name={"billAmount"}/>
+                      <input type="text" name={"billName"} value={billName} onChange={(e) => setBillName(e.target.value)}/>
+                      <label className={"form"} htmlFor="billAmount" >Bill Amount</label>
+                      <input type="text" name={"billAmount"} value={amount} onChange={(e) => setAmount(e.target.value)}/>
                       <label className={"form"} htmlFor="dueDate">Due Date</label>
-                      <input type="text" name={"dueDate"}/>
+                      <input type="text" name={"dueDate"} value={dueDate} onChange={(e) => setDueDate(e.target.value)}/>
                       <label className={"form"} htmlFor="category">Category</label>
-                      <input type="text" name={"category"}/>
+                      <input type="text" name={"category"} value={category} onChange={(e) => setCategory(e.target.value)}/>
                       <label className={"form"} htmlFor="source">Source</label>
-                      <input type="text" name={"source"}/>
+                      <input type="text" name={"source"} value={source} onChange={(e) => setSource(e.target.value)}/>
 
-                      <input className={"ml-100"} type="button" value={"Add/Update"}/>
+                      <input onClick={() => addBill()} className={"ml-100"} type="button" value={"Add/Update"}/>
                   </form>
 
               </div>
