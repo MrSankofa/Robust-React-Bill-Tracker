@@ -124,9 +124,10 @@ test('deletes the correct bill when deleting', () => {
 
     expect(updateBillNames).toHaveLength(1);
 
-    expect(billNames).toContain('Bill Two');
-    expect(billNames).not.toContain('Bill One');
+    expect(updateBillNames).toContain('Bill Two');
+    expect(updateBillNames).not.toContain('Bill One');
 
 
 
 })
+
