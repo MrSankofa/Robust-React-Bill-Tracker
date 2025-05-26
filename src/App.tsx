@@ -15,9 +15,8 @@ type Bill = {
 
 function App() {
     // todo: parse out components and separate add bill page from the landing page which will be the dashboard
-    // todo: you will need ids for your bills
     // todo: set up redux for bills
-    // todo: implement editing for bills
+
 
 
     const [editingBillId, setEditingBillingId] = useState<string | null>( null);
@@ -131,7 +130,7 @@ function App() {
 
 
 
-    // TODO: isPaid is not showing on the graph.
+
 
   return (
       <>
