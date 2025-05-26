@@ -1,30 +1,41 @@
 import './App.css'
 import {useState} from "react";
 import * as React from "react";
-import type {Bill} from "./context/BillContext.tsx";
+import {type Bill, BillActionTypes, type FormBill, useBills} from "./context/BillContext.tsx";
 
 
 function App() {
     // todo: parse out components and separate add bill page from the landing page which will be the dashboard
     // todo: set up redux for bills
 
+    /*
+    * todo: submitting to backend
+    *  const fullBill: Bill = {
+          ...formData,
+          id: formData.id ?? generateId(),
+          isPaid: false, // or preserve from previous if editing
+        };
+    * */
+    const {state, dispatch } = useBills();
+    const bills: Bill[] = state.bills;
+
     const [editingBillId, setEditingBillingId] = useState<string | null>( null);
 
     const isEditing = editingBillId !== null;
-    const [formData, setFormData ] = useState( {
-        id: JSON.stringify(Math.random()),
+    const [formData, setFormData ] = useState<FormBill>( {
         name: '',
         dueDate: 1,
         category: '',
         source: '',
         amount: 0,
-        isPaid: false,
         userId: "1"
     });
 
+
+
     const [errors, setErrors ] = useState<Record<string, string>>({})
 
-    const [bills, setBills] = useState([] as Bill[]);
+
 
     const handleInputChange = (field: string, value: string | number) => {
         setFormData( prevState => ({ ...prevState, [field]: value}));
@@ -66,7 +77,8 @@ function App() {
     }
 
     const deleteBill = (targetBill: Bill) => {
-        setBills( bills => bills.filter( bill => bill.id !== targetBill.id));
+        dispatch( {type: BillActionTypes.DELETE_BILL, payload: targetBill.id});
+        // setBills( bills => bills.filter( bill => bill.id !== targetBill.id));
     }
 
 
@@ -100,17 +112,10 @@ function App() {
         const newBill = getFormBillData();
 
         if(isEditing) {
-            setBills( bills => bills.map( bill => {
-
-                if(bill.id === editingBillId) {
-                    return newBill
-                }
-                return bill
-            }));
+            dispatch({ type: BillActionTypes.UPDATE_BILL, payload: newBill})
         } else {
+            dispatch({ type: BillActionTypes.ADD_BILL, payload: newBill})
 
-
-            setBills( bills => [...bills, newBill]);
         }
 
         setFormData({...emptyForm});

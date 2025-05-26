@@ -12,6 +12,9 @@ export type Bill = {
     isPaid: boolean;
 };
 
+export type FormBill = Omit<Bill, 'id' | 'userId' | 'isPaid'> & { id?: string, userId: string};
+
+
 
 export type BillState = {
     bills: Bill[],
@@ -29,6 +32,7 @@ export const BillActionTypes = {
 
 export type BillActionType = typeof BillActionTypes[keyof typeof BillActionTypes];
 
+export const BILL_ACTIONS = Object.values(BillActionTypes);
 
 type BillAction =
     | { type: typeof BillActionTypes.ADD_BILL; payload: Bill }
@@ -83,6 +87,7 @@ const billReducer = (state: BillState, action: BillAction): BillState => {
                 )
             };
         default:
+            void (action satisfies never); // cool way to match sure action is never missed in the code in the cases
             return state;
     }
 }
@@ -112,3 +117,5 @@ export const useBills = () => {
 
     return context;
 }
+
+
