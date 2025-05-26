@@ -1,17 +1,8 @@
 import './App.css'
 import {useState} from "react";
 import * as React from "react";
+import type {Bill} from "./context/BillContext.tsx";
 
-type Bill = {
-    id: string,
-    name: string;
-    amount: number;
-    dueDate: number;
-    category: string;
-    source: string;
-    userId: string;
-    isPaid: boolean;
-}
 
 function App() {
     // todo: parse out components and separate add bill page from the landing page which will be the dashboard
