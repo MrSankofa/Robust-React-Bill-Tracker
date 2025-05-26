@@ -5,11 +5,12 @@ import * as React from "react";
 type Bill = {
     id: string,
     name: string;
+    amount: number;
     dueDate: number;
     category: string;
     source: string;
     userId: string;
-    paid: boolean;
+    isPaid: boolean;
 }
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
         category: "Fixed Monthly Bills",
         source: "Ziegler",
         isPaid: false
-    }]);
+    }] as Bill[]);
 
     const handleInputChange = (field: string, value: string | number) => {
         setFormData( prevState => ({ ...prevState, [field]: value}));
@@ -84,10 +85,11 @@ function App() {
         const billData = {
             id: Date.now().toString(),
             name: formData.name,
+            amount: formData.amount,
             dueDate: formData.dueDate,
             category: formData.category,
             source: formData.source,
-            amount: formData.amount,
+            userId: "1",
             isPaid: bills.find( b => b.id === formData.id)?.isPaid || false
         };
 
@@ -98,6 +100,7 @@ function App() {
 
 
 
+    // TODO: isPaid is not showing on the graph.
 
   return (
       <>
