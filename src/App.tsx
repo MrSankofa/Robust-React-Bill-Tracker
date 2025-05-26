@@ -20,7 +20,9 @@ function App() {
     // todo: implement editing for bills
 
 
-    const [isEditing, setIsEditing] = useState( false);
+    const [editingBillId, setEditingBillingId] = useState<string | null>( null);
+
+    const isEditing = editingBillId !== null;
     const [formData, setFormData ] = useState( {
         id: JSON.stringify(Math.random()),
         name: '',
@@ -70,55 +72,57 @@ function App() {
         return Object.keys(newErrors).length === 0;
     }
 
-    const toggleEdit = ( bill: Bill) => {
-        setIsEditing(prevState => !prevState);
-
-        setFormData(() => (
-            {
-                name: bill.name,
-                dueDate: bill.dueDate,
-                category: bill.category,
-                source: bill.source,
-                amount: bill.amount,
-                isPaid: bill.isPaid,
-                id: bill.id,
-                userId: bill.userId
-            }
-        ));
-
-
+    const startEditing = ( bill: Bill) => {
+        setFormData(bill);
+        setEditingBillingId(bill.id)
     }
 
+
+    const getFormBillData = (): Bill => ({
+        id: editingBillId || Date.now().toString(),
+        name: formData.name,
+        amount: formData.amount,
+        dueDate: formData.dueDate,
+        category: formData.category,
+        source: formData.source,
+        userId: formData.userId,
+        isPaid: editingBillId ? bills.find( b => b.id === editingBillId)?.isPaid ?? false : false
+    });
+
+    const emptyForm = {
+        id: "",
+        name: "",
+        amount: 0,
+        dueDate: 1,
+        category: "",
+        source: "",
+        userId: "1",
+        isPaid: false,
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if( !validateForm()) return;
 
-        const billData = {
-            id: isEditing ? formData.id : Date.now().toString(),
-            name: formData.name,
-            amount: formData.amount,
-            dueDate: formData.dueDate,
-            category: formData.category,
-            source: formData.source,
-            userId: formData.userId,
-            isPaid: isEditing ? formData.isPaid : bills.find( b => b.id === formData.id)?.isPaid || false
-        };
+        const newBill = getFormBillData();
 
         if(isEditing) {
             setBills( bills => bills.map( bill => {
 
-                if(bill.id === formData.id) {
-                    return billData
+                if(bill.id === editingBillId) {
+                    return newBill
                 }
                 return bill
             }));
         } else {
 
 
-            setBills( bills => [...bills, billData]);
+            setBills( bills => [...bills, newBill]);
         }
+
+        setFormData({...emptyForm});
+        setEditingBillingId(null);
 
 
     }
@@ -182,7 +186,7 @@ function App() {
                               <td> {bill["source"]}</td>
                               <td> {bill["isPaid"] ? "Yes" : "No"} </td>
                               <td>
-                                  <button onClick={ () => { toggleEdit(bill)}}>Edit</button>
+                                  <button onClick={ () => { startEditing(bill)}}>Edit</button>
                               </td>
                           </tr>
                       })}
