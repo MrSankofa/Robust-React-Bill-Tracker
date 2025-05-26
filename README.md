@@ -7,6 +7,28 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+
+## Goal:
+
+- develop crud bills with react
+- develop redux bills with react
+- develop redux slices with react
+- develop react router with react
+- add toast to application
+- connect java spring boot api to frontend
+- Add income page feature
+- Add Unpaid Bills section
+- Add Upcoming Bills section
+- Add Pain Bills section
+- Add Metrics feature with Expenses by Category / By Source, Total Monthly Income, Total Expenses, Remaining Budget, Total Bills
+- Add Financial Projection feature
+- Add Actual Financials Feature
+- Add Budget Overview Feature
+- Add 6 month project overview / actual results
+- Add a personal login feature
+- add a bulk load feature with csv
+
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
