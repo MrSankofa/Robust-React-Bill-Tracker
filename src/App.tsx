@@ -1,43 +1,101 @@
 import './App.css'
 import {useState} from "react";
+import * as React from "react";
+
+type Bill = {
+    id: string,
+    name: string;
+    dueDate: number;
+    category: string;
+    source: string;
+    userId: string;
+    paid: boolean;
+}
 
 function App() {
+    // todo: parse out components and separate add bill page from the landing page which will be the dashboard
+    // todo: you will need ids for your bills
+    // todo: set up redux for bills
+    // todo: implement editing for bills
 
+
+    const [formData, setFormData ] = useState( {
+        id: JSON.stringify(Math.random()),
+        name: '',
+        dueDate: 1,
+        category: '',
+        source: '',
+        amount: 0,
+        isPaid: false
+    });
+
+    const [errors, setErrors ] = useState<Record<string, string>>({})
 
     const [bills, setBills] = useState([{
-        billName: "ziegler",
+        id: JSON.stringify(Math.random()),
+        name: "ziegler",
         amount: 1490,
         dueDate: 1,
         category: "Fixed Monthly Bills",
         source: "Ziegler",
+        isPaid: false
     }]);
 
+    const handleInputChange = (field: string, value: string | number) => {
+        setFormData( prevState => ({ ...prevState, [field]: value}));
+
+        if(errors[field]) setErrors( prevState => ({ ...prevState, [field]: ''}));
+    };
 
 
-    const [billName, setBillName] = useState("");
-    const [amount, setAmount] = useState(0);
-    const [dueDate, setDueDate] = useState(0);
-    const [category, setCategory] = useState("");
-    const [source, setSource] = useState("");
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if(!formData.name.trim()) {
+            newErrors.name = 'Bill Name is required';
+        }
+
+        if(!formData.category.trim()) {
+            newErrors.category = 'Category is required';
+        }
+
+        if(!formData.source.trim()) {
+            newErrors.source = 'source is required';
+        }
+
+        if(formData.amount <= 0) {
+            newErrors.amount = 'Amount must be greater than 0';
+        }
+
+        if(formData.dueDate < 1 || formData.dueDate > 31) {
+            newErrors.dueDate = 'Due date must be between 1 and 31';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
 
 
-    const addBill = () => {
-        const bill = {
-            billName,
-            amount,
-            dueDate,
-            category,
-            source
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if( !validateForm()) return;
+
+        const billData = {
+            id: Date.now().toString(),
+            name: formData.name,
+            dueDate: formData.dueDate,
+            category: formData.category,
+            source: formData.source,
+            amount: formData.amount,
+            isPaid: bills.find( b => b.id === formData.id)?.isPaid || false
         };
 
-        setBills( (bills) => [...bills, bill] );
-
-        setBillName(() => "");
-        setAmount(() => 0);
-        setDueDate(() => 0);
-        setCategory(() => "");
-        setSource(() => "");
+        setBills( bills => [...bills, billData]);
     }
+
+
+
 
 
 
@@ -49,19 +107,19 @@ function App() {
                   <h1 className="text-4xl font-bold text-blue-600">Add / Update Bill</h1>
 
 
-                  <form className={"w-full"}>
+                  <form onSubmit={handleSubmit} className={"w-full"}>
                       <label className={"form"} htmlFor="billName">Bill Name</label>
-                      <input type="text" name={"billName"} value={billName} onChange={(e) => setBillName(e.target.value)}/>
+                      <input type="text" name={"billName"} placeholder={"e.g. DTE"} value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)}/>
                       <label className={"form"} htmlFor="billAmount" >Bill Amount</label>
-                      <input type="text" name={"billAmount"} value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}/>
+                      <input type="number" name={"billAmount"} placeholder={"0.00"} value={formData.amount || ''} onChange={(e) => handleInputChange("amount", parseFloat(e.target.value))}/>
                       <label className={"form"} htmlFor="dueDate">Due Date</label>
-                      <input type="text" name={"dueDate"} value={dueDate} onChange={(e) => setDueDate(parseFloat(e.target.value))}/>
+                      <input type="number" name={"dueDate"} placeholder={'15'} value={formData.dueDate || ''} onChange={(e) => handleInputChange("dueDate", parseFloat(e.target.value))}/>
                       <label className={"form"} htmlFor="category">Category</label>
-                      <input type="text" name={"category"} value={category} onChange={(e) => setCategory(e.target.value)}/>
+                      <input type="text" name={"category"} placeholder={"e.g. Unnecessary Bill"} value={formData.category} onChange={(e) => handleInputChange("category", e.target.value) }/>
                       <label className={"form"} htmlFor="source">Source</label>
-                      <input type="text" name={"source"} value={source} onChange={(e) => setSource(e.target.value)}/>
+                      <input type="text" name={"source"} placeholder={"e.g. chase"} value={formData.source} onChange={(e) => handleInputChange("source", e.target.value ) } />
 
-                      <input onClick={() => addBill()} className={"ml-100"} type="button" value={"Add/Update"}/>
+                      <button className={"ml-100"} type="submit">Add / Update</button>
                   </form>
 
               </div>
@@ -79,18 +137,20 @@ function App() {
                           <th>Due Date</th>
                           <th>Category</th>
                           <th>Source</th>
+                          <th>isPaid</th>
                       </tr>
                       </thead>
                       <tbody id={"bill-list"}>
 
 
                       { bills.map( data => {
-                          return <tr>
-                              <td> {data["billName"]}</td>
+                          return <tr key={data["id"]}>
+                              <td> {data["name"]}</td>
                               <td> {data["amount"]}</td>
                               <td> {data["dueDate"]}</td>
                               <td> {data["category"]}</td>
                               <td> {data["source"]}</td>
+                              <td> {data["isPaid"]}</td>
                           </tr>
                       })}
                       </tbody>
