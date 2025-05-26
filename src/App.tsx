@@ -53,9 +53,9 @@ function App() {
                       <label className={"form"} htmlFor="billName">Bill Name</label>
                       <input type="text" name={"billName"} value={billName} onChange={(e) => setBillName(e.target.value)}/>
                       <label className={"form"} htmlFor="billAmount" >Bill Amount</label>
-                      <input type="text" name={"billAmount"} value={amount} onChange={(e) => setAmount(e.target.value)}/>
+                      <input type="text" name={"billAmount"} value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}/>
                       <label className={"form"} htmlFor="dueDate">Due Date</label>
-                      <input type="text" name={"dueDate"} value={dueDate} onChange={(e) => setDueDate(e.target.value)}/>
+                      <input type="text" name={"dueDate"} value={dueDate} onChange={(e) => setDueDate(parseFloat(e.target.value))}/>
                       <label className={"form"} htmlFor="category">Category</label>
                       <input type="text" name={"category"} value={category} onChange={(e) => setCategory(e.target.value)}/>
                       <label className={"form"} htmlFor="source">Source</label>
