@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from './App';
+import {BillProvider} from "./context/BillContext.tsx";
 
 function addBill({
                      name,
@@ -35,7 +36,11 @@ function addBill({
 
 
 test('updates the correct bill when editing', () => {
-    render(<App />);
+    render(
+        <BillProvider>
+            <App />
+        </BillProvider>
+    );
 
     // Add two bills
     addBill({ name: 'Bill One' });
@@ -67,7 +72,11 @@ test('updates the correct bill when editing', () => {
 });
 
 test('editing a second bill before submitting the first only updates the last one clicked', () => {
-    render(<App />);
+    render(
+        <BillProvider>
+            <App />
+        </BillProvider>
+    );
 
     // Add two bills
     addBill({ name: 'Bill A' });
@@ -98,7 +107,11 @@ test('editing a second bill before submitting the first only updates the last on
 });
 
 test('deletes the correct bill when deleting', () => {
-    render(<App />);
+    render(
+        <BillProvider>
+            <App />
+        </BillProvider>
+    );
 
     // Add two bills
     addBill({ name: 'Bill One' });
