@@ -20,6 +20,7 @@ function App() {
     // todo: implement editing for bills
 
 
+    const [isEditing, setIsEditing] = useState( false);
     const [formData, setFormData ] = useState( {
         id: JSON.stringify(Math.random()),
         name: '',
@@ -27,7 +28,8 @@ function App() {
         category: '',
         source: '',
         amount: 0,
-        isPaid: false
+        isPaid: false,
+        userId: "1"
     });
 
     const [errors, setErrors ] = useState<Record<string, string>>({})
@@ -76,6 +78,25 @@ function App() {
         return Object.keys(newErrors).length === 0;
     }
 
+    const toggleEdit = ( bill: Bill) => {
+        setIsEditing(prevState => !prevState);
+
+        setFormData(() => (
+            {
+                name: bill.name,
+                dueDate: bill.dueDate,
+                category: bill.category,
+                source: bill.source,
+                amount: bill.amount,
+                isPaid: bill.isPaid,
+                id: bill.id,
+                userId: bill.userId
+            }
+        ));
+
+
+    }
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -83,17 +104,31 @@ function App() {
         if( !validateForm()) return;
 
         const billData = {
-            id: Date.now().toString(),
+            id: isEditing ? formData.id : Date.now().toString(),
             name: formData.name,
             amount: formData.amount,
             dueDate: formData.dueDate,
             category: formData.category,
             source: formData.source,
-            userId: "1",
-            isPaid: bills.find( b => b.id === formData.id)?.isPaid || false
+            userId: formData.userId,
+            isPaid: isEditing ? formData.isPaid : bills.find( b => b.id === formData.id)?.isPaid || false
         };
 
-        setBills( bills => [...bills, billData]);
+        if(isEditing) {
+            setBills( bills => bills.map( bill => {
+
+                if(bill.id === formData.id) {
+                    return billData
+                }
+                return bill
+            }));
+        } else {
+
+
+            setBills( bills => [...bills, billData]);
+        }
+
+
     }
 
 
@@ -107,7 +142,7 @@ function App() {
           <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
 
               <div className="w-full max-w-5xl px-4">
-                  <h1 className="text-4xl font-bold text-blue-600">Add / Update Bill</h1>
+                  <h1 className="text-4xl font-bold text-blue-600">{ isEditing ? "Update " : "Add " }Bill</h1>
 
 
                   <form onSubmit={handleSubmit} className={"w-full"}>
@@ -122,7 +157,7 @@ function App() {
                       <label className={"form"} htmlFor="source">Source</label>
                       <input type="text" name={"source"} placeholder={"e.g. chase"} value={formData.source} onChange={(e) => handleInputChange("source", e.target.value ) } />
 
-                      <button className={"ml-100"} type="submit">Add / Update</button>
+                      <button className={"ml-100"} type="submit">{ isEditing ? "Update " : "Add " }</button>
                   </form>
 
               </div>
@@ -146,15 +181,15 @@ function App() {
                       <tbody id={"bill-list"}>
 
 
-                      { bills.map( data => {
-                          return <tr key={data["id"]}>
-                              <td> {data["name"]}</td>
-                              <td> {data["amount"]}</td>
-                              <td> {data["dueDate"]}</td>
-                              <td> {data["category"]}</td>
-                              <td> {data["source"]}</td>
-                              <td> {data["isPaid"] ? "Yes" : "No"} </td>
-                              <button>Edit</button>
+                      { bills.map( bill => {
+                          return <tr key={bill["id"]}>
+                              <td> {bill["name"]}</td>
+                              <td> {bill["amount"]}</td>
+                              <td> {bill["dueDate"]}</td>
+                              <td> {bill["category"]}</td>
+                              <td> {bill["source"]}</td>
+                              <td> {bill["isPaid"] ? "Yes" : "No"} </td>
+                              <button onClick={ () => { toggleEdit(bill)}}>Edit</button>
                           </tr>
                       })}
                       </tbody>
