@@ -34,15 +34,7 @@ function App() {
 
     const [errors, setErrors ] = useState<Record<string, string>>({})
 
-    const [bills, setBills] = useState([{
-        id: JSON.stringify(Math.random()),
-        name: "ziegler",
-        amount: 1490,
-        dueDate: 1,
-        category: "Fixed Monthly Bills",
-        source: "Ziegler",
-        isPaid: false
-    }] as Bill[]);
+    const [bills, setBills] = useState([] as Bill[]);
 
     const handleInputChange = (field: string, value: string | number) => {
         setFormData( prevState => ({ ...prevState, [field]: value}));
