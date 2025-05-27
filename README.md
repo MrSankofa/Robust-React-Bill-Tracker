@@ -10,10 +10,11 @@ Currently, two official plugins are available:
 
 ## Goal:
 
-- develop crud bills with react
-- develop redux bills with react
-- develop redux slices with react
-- develop react router with react
+- develop crud bills with react *
+- develop redux bills with react *
+- develop redux slices with react *
+- develop react router with react * 
+- Connect to Java Spring Boot API *
 - add toast to application
 - connect java spring boot api to frontend
 - Add income page feature
