@@ -94,13 +94,7 @@ function App() {
 
   const startEditing = (targetBill: Bill) => {
     setBillId(targetBill.id);
-    setFormData({
-      name: targetBill.name,
-      amount: targetBill.amount,
-      dueDate: targetBill.dueDate,
-      category: targetBill.category,
-      account: targetBill.account,
-    });
+    setFormData(targetBill);
   }
 
 
