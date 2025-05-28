@@ -2,9 +2,13 @@ import './App.css'
 import {useBills} from "./components/useBills.ts";
 import {BillForm} from "./components/BillForm.tsx";
 import {BillTable} from "./components/BillTable.tsx";
+import {useState} from "react";
 
 
 function App() {
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
+    const authToken = localStorage.getItem('authToken');
     const {
         bills,
         formData,
@@ -14,7 +18,7 @@ function App() {
         handleInputChange,
         startEditing,
         deleteBill,
-    } = useBills();
+    } = useBills(authToken, { onUnauthorized: () => setShowLoginModal(true) });
 
     return (
         <div className="p-6">
@@ -33,6 +37,8 @@ function App() {
                 onEdit={startEditing}
                 onDelete={deleteBill}
             />
+            {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+
         </div>
     );
 }
