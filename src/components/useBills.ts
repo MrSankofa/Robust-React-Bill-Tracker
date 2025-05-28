@@ -118,9 +118,9 @@ export const useBills = (authToken: string | null, onUnauthorized: () => void ) 
         setEditBillId(bill.id);
     }
 
-    const deleteBill = async (bill: Bill) => {
+    const deleteBill = async (targetBill: Bill) => {
         try {
-            const response = await fetch(`${BASE_URL}/${bill.id}`, {
+            const response = await fetch(`${BASE_URL}/${targetBill.id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${authToken}`
@@ -133,7 +133,7 @@ export const useBills = (authToken: string | null, onUnauthorized: () => void ) 
             }
 
             if(response.status === 204) {
-                setBills(prevState => prevState.filter(bill => bill.id !== bill.id));
+                setBills(prevState => prevState.filter(bill => bill.id !== targetBill.id));
             } else {
                 throw new Error('Failed to delete')
             }
