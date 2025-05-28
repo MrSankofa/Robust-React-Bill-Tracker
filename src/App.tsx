@@ -1,14 +1,16 @@
-import './App.css'
+import {useEffect, useState} from "react";
 import {useBills} from "./components/useBills.ts";
 import {BillForm} from "./components/BillForm.tsx";
 import {BillTable} from "./components/BillTable.tsx";
-import {useState} from "react";
+import {LoginModal} from "./components/LoginModal.tsx";
 
 
 function App() {
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [authToken, setAuthToken] = useState<string | null>(
+        localStorage.getItem('authToken')
+    );
 
-    const authToken = localStorage.getItem('authToken');
     const {
         bills,
         formData,
@@ -17,8 +19,21 @@ function App() {
         handleSubmit,
         handleInputChange,
         startEditing,
-        deleteBill,
-    } = useBills(authToken, { onUnauthorized: () => setShowLoginModal(true) });
+        deleteBill
+    } = useBills(authToken, () => setShowLoginModal(true));
+
+    useEffect(() => {
+        if (!authToken) {
+            setShowLoginModal(true);
+        }
+    }, [authToken]);
+
+
+    const handleLoginSuccess = (token: string) => {
+        localStorage.setItem('authToken', token);
+        setAuthToken(token);
+        setShowLoginModal(false);
+    };
 
     return (
         <div className="p-6">
@@ -37,10 +52,15 @@ function App() {
                 onEdit={startEditing}
                 onDelete={deleteBill}
             />
-            {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
 
+            {showLoginModal && (
+                <LoginModal
+                    onSuccess={handleLoginSuccess}
+                    onClose={() => setShowLoginModal(false)}
+                />
+            )}
         </div>
     );
 }
 
-export default App
+export default App;
