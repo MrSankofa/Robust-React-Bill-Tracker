@@ -1,6 +1,6 @@
 import './App.css'
 import * as React from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 type Bill = {
     id: string;
@@ -14,6 +14,9 @@ type Bill = {
 
 function App() {
 
+    const BASE_URL = "http://localhost:8080/api/bills";
+    const USER_ID = "1";
+
     const emptyBill: Omit<Bill, "id" | "userId"> = {
         name: '',
         amount: 0,
@@ -24,6 +27,13 @@ function App() {
     const [formData, setFormData] = useState(emptyBill);
     const [editBillId, setEditBillId] = useState<string | null>(null);
     const [bills, setBills] = useState<Bill[]>([]);
+
+    useEffect(() => {
+        fetch(`${BASE_URL}?userId=${USER_ID}`)
+            .then(res => res.json())
+            .then(setBills)
+            .catch(err => console.error("Failed to fetch bills", err));
+    }, []);
 
     const isEditing = editBillId !== null;
 
@@ -40,33 +50,77 @@ function App() {
 
         return newBill;
     }
+    const [errors, setErrors ] = useState<Record<string, string>>({})
 
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if(!formData.name.trim()) {
+            newErrors.name = 'Bill Name is required';
+        }
+
+        if(!formData.category.trim()) {
+            newErrors.category = 'Category is required';
+        }
+
+        if(!formData.account.trim()) {
+            newErrors.source = 'source is required';
+        }
+
+        if(formData.amount <= 0) {
+            newErrors.amount = 'Amount must be greater than 0';
+        }
+
+        if(formData.dueDate < 1 || formData.dueDate > 31) {
+            newErrors.dueDate = 'Due date must be between 1 and 31';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+
+        if( !validateForm()) return;
 
       const id: string = editBillId || Date.now().toString();
 
       const newBill: Bill = getFormData(id);
 
-      if(isEditing) {
-          setBills(prevState => prevState.map( bill => {
-              if( bill.id === editBillId) {
-                  return newBill;
-              }
+      const method = isEditing ? 'PUT' : 'POST';
+      const url = isEditing ? `${BASE_URL}/${id}` : BASE_URL;
 
-              return bill;
-          }))
-      } else {
-          setBills( prevState => [...prevState, newBill]);
+      try {
+          const response = await fetch(url, {
+              method,
+              headers: { "Content-Type": "application/json"},
+              body: JSON.stringify(newBill)
+          });
+
+          if (!response.ok) throw new Error("failed to save bill");
+
+          const savedBill = await response.json();
+
+          setBills( prev => isEditing ?
+            prev.map( bill => bill.id === id ? savedBill : bill) :
+            [...prev, savedBill]
+          );
+
+          setFormData(emptyBill);
+          setEditBillId(null);
+      }  catch (err) {
+          console.log("Error saving bill: ", err);
       }
 
-      setFormData(emptyBill);
-      setEditBillId(null);
     };
 
     const handleInputChange = (field: string, data: string | number) => {
+
         setFormData( prevState => ({...prevState, [field]: data}));
+
     }
 
     const startEditing = (targetBill: Bill) => {
@@ -74,7 +128,21 @@ function App() {
         setEditBillId(targetBill.id);
     }
 
-    const deleteBill = (targetBill: Bill) => {
+    const deleteBill = async (targetBill: Bill) => {
+
+        try {
+            const response = await fetch(`${BASE_URL}/${targetBill.id}`, {
+                method: "DELETE"
+            })
+
+            if(response.status === 204) {
+                setBills(prevState => prevState.filter( bill => bill.id !== targetBill.id));
+            } else {
+                throw new Error("Failed to delete");
+            }
+        } catch (err) {
+            console.error("Error deleting bill:", err);
+        }
 
         setBills(prevState => prevState.filter( bill => bill.id !== targetBill.id));
     }
@@ -86,31 +154,37 @@ function App() {
         <section>
             <form action="#" onSubmit={handleSubmit}>
                 <label htmlFor="name">name</label>
-                <input autoComplete={"off"} id={"name"} type="text" value={formData.name}
+                <input autoComplete={"off"} id={"name"} type="text" value={formData.name}  className={errors.name ? 'border-red-500' : ''}
                        placeholder={"e.g. DTE"}
                        onChange={(e) => handleInputChange("name", e.target.value)}/>
 
+                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+
                 <label htmlFor="amount">amount</label>
-                <input autoComplete={"off"} id={"amount"} type="number" value={formData.amount || ''}
+                <input autoComplete={"off"} id={"amount"} type="number" value={formData.amount || ''}  className={errors.amount ? 'border-red-500' : ''}
                        placeholder={"0.00"}
                        onChange={(e) => handleInputChange("amount", parseFloat(e.target.value))}/>
 
+                {errors.amount && <p className="text-red-500 text-sm">{errors.amount}</p>}
                 <label htmlFor="dueDate">dueDate</label>
-                <input autoComplete={"off"} id={"dueDate"} type="number" value={formData.dueDate || ''}
+                <input autoComplete={"off"} id={"dueDate"} type="number" value={formData.dueDate || ''}  className={errors.dueDate ? 'border-red-500' : ''}
                        placeholder={"15"}
                        onChange={(e) => handleInputChange("dueDate", parseFloat(e.target.value))}/>
 
+                {errors.dueDate && <p className="text-red-500 text-sm">{errors.dueDate}</p>}
                 <label htmlFor="category">category</label>
-                <input autoComplete={"off"} id={"category"} type="text" value={formData.category}
+                <input autoComplete={"off"} id={"category"} type="text" value={formData.category}  className={errors.category ? 'border-red-500' : ''}
                        placeholder={"e.g. fmb"}
                        onChange={(e) => handleInputChange("category", e.target.value)}/>
 
+                {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
                 <label htmlFor="account">account</label>
-                <input autoComplete={"off"} id={"account"} type="text" value={formData.account}
+                <input autoComplete={"off"} id={"account"} type="text" value={formData.account}  className={errors.account ? 'border-red-500' : ''}
                        placeholder={"chase"}
                        onChange={(e) => handleInputChange("account", e.target.value)}/>
 
 
+                {errors.account && <p className="text-red-500 text-sm">{errors.account}</p>}
                 <input type="submit" value={isEditing ? "Update Bill" : "Add Bill"}/>
             </form>
         </section>
@@ -135,8 +209,13 @@ function App() {
                                <td>{bill.dueDate}</td>
                                <td>{bill.category}</td>
                                <td>{bill.account}</td>
-                               <td onClick={() => startEditing(bill)}>edit</td>
-                               <td onClick={ () => deleteBill(bill)}>delete</td>
+                               <td>
+                                   <button  onClick={() => startEditing(bill)}>edit</button>
+                               </td>
+
+                               <td>
+                                   <button   onClick={ () => deleteBill(bill)}>delete</button>
+                               </td>
                            </tr>
                        ))
                       }
